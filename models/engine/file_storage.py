@@ -15,10 +15,10 @@ class FileStorage:
 
         filtered_objects = {}
         for key, obj in self.__objects.items():
-            if obj.__class__ == cls:
+            if isinstance(obj, cls):
                 filtered_objects[key] = obj
 
-        return list(filtered_objects.values())
+        return filtered_objects
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -26,11 +26,11 @@ class FileStorage:
 
     def save(self):
         """Saves storage dictionary to file"""
-        temp = {}
-        for key, val in self.__objects.items():
-            temp[key] = val.to_dict()
-
-        with open(self.__file_path, 'w') as f:
+        with open(FileStorage.__file_path, 'w') as f:
+            temp = {}
+            temp.update(self.__objects)
+            for key, val in temp.items():
+                temp[key] = val.to_dict()
             json.dump(temp, f)
 
     def reload(self):
@@ -49,7 +49,8 @@ class FileStorage:
             'Review': Review
         }
         try:
-            with open(self.__file_path, 'r') as f:
+            temp = {}
+            with open(FileStorage.__file_path, 'r') as f:
                 temp = json.load(f)
                 for key, val in temp.items():
                     self.__objects[key] = classes[val['__class__']](**val)
@@ -60,7 +61,7 @@ class FileStorage:
         """Deletes obj from __objects if it's inside"""
         if obj is None:
             return
-
-        key = obj.__class__.__name__ + '.' + obj.id
-        if key in self.__objects:
-            del self.__objects[key]
+        else:
+            key = "{}.{}".format(type(obj).__name__, obj.id)
+            if key in self.all():
+                del self.all()[key]
