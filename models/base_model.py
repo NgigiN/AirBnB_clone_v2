@@ -16,15 +16,15 @@ else:
 
 class BaseModel:
     """A base class for all hbnb models"""
-    if getenv("HBNB_TYPE_STORAGE") == 'db':
+
+    if getenv("HBNB_TYPE_STORAGE0") == 'db':
         id = Column(String(60), nullable=False, primary_key=True)
-        created_at = Column(DateTime, nullable=False,
-                            default=datetime.utcnow)
-        updated_at = Column(DateTime, nullable=False,
-                            default=datetime.utcnow)
+        created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+        updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, *args, **kwargs):
-        """Instantiates a new model"""
+        """Instatntiates a new model"""
+
         self.id = str(uuid.uuid4())
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
@@ -32,16 +32,16 @@ class BaseModel:
             if key == '__class__':
                 continue
             setattr(self, key, value)
-            if isinstance(self.created_at, str):
+            if type(self.created_at) is str:
                 self.created_at = datetime.strptime(
                     self.created_at, '%Y-%m-%dT%H:%M:%S.%f')
-            if isinstance(self.updated_at, str):
+            if type(self.updated_at) is str:
                 self.updated_at = datetime.strptime(
                     self.updated_at, '%Y-%m-%dT%H:%M:%S.%f')
 
     def __str__(self):
         """Returns a string representation of the instance"""
-        cls = type(self).__name__
+        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
         return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
 
     def save(self):
@@ -51,12 +51,13 @@ class BaseModel:
         models.storage.save()
 
     def to_dict(self):
-        """Converts instance into a dictionary format"""
-        dictionary = self.__dict__.copy()
-        dictionary["__class__"] = type(self).__name__
+        """Convert instance into dict format"""
+        dictionary = dict(self.__dict__)
+        dictionary["__class__"] = str(type(self).__name__)
         dictionary['created_at'] = self.created_at.isoformat()
         dictionary['updated_at'] = self.updated_at.isoformat()
-        dictionary.pop('_sa_instance_state', None)
+        if '_sa_instance_state' in dictionary.keys():
+            del dictionary['_sa_instance_state']
         return dictionary
 
     def delete(self):
