@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 import unittest
 import models
+from models.engine.db_storage import DBStorage
 from models.user import User
 from models import storage
 from models.base_model import BaseModel
