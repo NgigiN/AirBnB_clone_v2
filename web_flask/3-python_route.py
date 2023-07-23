@@ -23,8 +23,9 @@ def c(text):
     return 'C {}'.format(text.replace('_', ' '))
 
 
+@app.route('/python')
 @app.route('/python/<text>')
-def python(text):
+def python(text='is cool'):
     """ Function that returns Python followed by text """
     return 'Python {}'.format(text.repalce('_', ' '))
 
